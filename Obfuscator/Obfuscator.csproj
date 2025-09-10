@@ -1,18 +1,98 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <RootNamespace>Obfuscator</RootNamespace>
-        <AssemblyName>Obfuscator</AssemblyName>
-        <version>1.0.1</version>
+        <!-- Targeting -->
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
+
+        <!-- Assembly Configuration -->
+        <RootNamespace>Obfuscator</RootNamespace>
+        <AssemblyName>EncineCarlos.Obfuscator</AssemblyName>
+        
+        <!-- Package Information -->
+        <PackageId>EncineCarlos.Obfuscator</PackageId>
+        <Version>1.0.0</Version>
+        <PackageVersion>$(Version)</PackageVersion>
+        
+        <!-- Package Metadata -->
+        <Title>Data Obfuscator</Title>
+        <Description>A powerful and easy-to-use library for obfuscating sensitive data in .NET applications. Automatically redacts properties marked with [SensitiveData] attribute using Microsoft Extensions Compliance framework. Perfect for logging, debugging, and data protection scenarios.</Description>
+        <Summary>Data obfuscation library that automatically redacts sensitive information using attributes and Microsoft Extensions Compliance.</Summary>
+        <PackageTags>obfuscation;data-protection;privacy;redaction;sensitive-data;logging;security;compliance;gdpr;pii</PackageTags>
+        
+        <!-- Author Information -->
+        <Authors>Carlos Encine</Authors>
+        <Company>EncineCarlos</Company>
+        <Copyright>Copyright © Carlos Encine 2025</Copyright>
+        
+        <!-- URLs and Links -->
+        <PackageProjectUrl>https://github.com/encinecarlos/obfuscator</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/encinecarlos/obfuscator</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        
+        <!-- Release Notes -->
+        <PackageReleaseNotes>
+v1.0.0:
+- Initial release with full obfuscation functionality
+- Support for JsonPropertyName attribute in property serialization
+- Enhanced nested object handling for complex data structures
+- Improved redaction capabilities using Microsoft Extensions Compliance
+- Complete integration with dependency injection container
+- Attribute-based obfuscation with [SensitiveData] marking
+        </PackageReleaseNotes>
+        
+        <!-- Build Configuration -->
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        
+        <!-- Assembly Metadata -->
+        <AssemblyTitle>$(Title)</AssemblyTitle>
+        <AssemblyDescription>$(Description)</AssemblyDescription>
+        <AssemblyCompany>$(Company)</AssemblyCompany>
+        <AssemblyCopyright>$(Copyright)</AssemblyCopyright>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
+        <InformationalVersion>$(Version)</InformationalVersion>
     </PropertyGroup>
 
+    <!-- Package Dependencies -->
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.Compliance.Abstractions" Version="9.8.0" />
-      <PackageReference Include="Microsoft.Extensions.Compliance.Redaction" Version="9.8.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
-      <PackageReference Include="System.Text.Json" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Compliance.Abstractions" Version="8.10.0" />
+        <PackageReference Include="Microsoft.Extensions.Compliance.Redaction" Version="8.10.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+        <PackageReference Include="System.Text.Json" Version="8.0.6" />
+    </ItemGroup>
+
+    <!-- Include files in package -->
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\LICENSE" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <!-- Documentation warnings -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningsAsErrors />
+        <NoWarn>CS1591</NoWarn> <!-- Missing XML documentation -->
+    </PropertyGroup>
+
+    <!-- Source Link for debugging -->
+    <PropertyGroup>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <!-- Source Link package -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>

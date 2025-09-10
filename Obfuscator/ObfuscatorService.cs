@@ -1,11 +1,11 @@
-using Microsoft.Extensions.Compliance.Classification;
-using Microsoft.Extensions.Compliance.Redaction;
-using Obfuscator.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Compliance.Classification;
+using Microsoft.Extensions.Compliance.Redaction;
+using Obfuscator.Interfaces;
 
 namespace Obfuscator
 {
@@ -18,7 +18,7 @@ namespace Obfuscator
             _redactorProvider = redactorProvider;
         }
 
-        public string SanitizeSensitiveData<T>(T input)
+        public string ObfuscateSensitiveData<T>(T input)
         {
             var readctor = _redactorProvider.GetRedactor(new DataClassificationSet());
 
@@ -35,24 +35,26 @@ namespace Obfuscator
 
                 var propertySerialized = prop.GetCustomAttribute<JsonPropertyNameAttribute>();
 
-                var propertyName = propertySerialized.Name ?? prop.Name;
+                var propertyName = propertySerialized != null
+                    ? propertySerialized.Name
+                    : prop.Name;
 
                 if (prop.PropertyType == typeof(string))
                 {
                     var strValue = propValue as string ?? String.Empty;
-                    valueObjects[prop.Name] = attr != null ? readctor.Redact(strValue) : strValue;
+                    valueObjects[propertyName] = attr != null ? readctor.Redact(strValue) : strValue;
                 }
                 else if (prop.PropertyType.IsValueType)
                 {
                     if (attr != null && propValue != null)
-                        valueObjects[prop.Name] = readctor.Redact(propValue.ToString());
+                        valueObjects[propertyName] = readctor.Redact(propValue.ToString());
                     else
-                        valueObjects[propertyName] = propValue;
+                        valueObjects[propertyName] = propValue ?? string.Empty;
 
                 }
                 else if (prop.PropertyType.IsClass)
                 {
-                    valueObjects[propertyName] = propValue != null ? SanitizeSensitiveData(propValue) : null;
+                    valueObjects[propertyName] = propValue != null ? ObfuscateSensitiveData(propValue) : string.Empty;
                 }
                 else
                 {
