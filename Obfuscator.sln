@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36408.4
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11205.157 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obfuscator", "Obfuscator\Obfuscator.csproj", "{7BCDF3FE-8228-4E08-9D3F-62C11EC7EECD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obfuscator", "src\Obfuscator.csproj", "{E255E7DE-8316-7C85-EFF3-E47B34D89988}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obfuscator.tests", "tests\Obfuscator.tests\Obfuscator.tests.csproj", "{B991CA7E-4567-4FBC-A687-177079F5707C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7BCDF3FE-8228-4E08-9D3F-62C11EC7EECD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7BCDF3FE-8228-4E08-9D3F-62C11EC7EECD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7BCDF3FE-8228-4E08-9D3F-62C11EC7EECD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7BCDF3FE-8228-4E08-9D3F-62C11EC7EECD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E255E7DE-8316-7C85-EFF3-E47B34D89988}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E255E7DE-8316-7C85-EFF3-E47B34D89988}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E255E7DE-8316-7C85-EFF3-E47B34D89988}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E255E7DE-8316-7C85-EFF3-E47B34D89988}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B991CA7E-4567-4FBC-A687-177079F5707C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B991CA7E-4567-4FBC-A687-177079F5707C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B991CA7E-4567-4FBC-A687-177079F5707C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B991CA7E-4567-4FBC-A687-177079F5707C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
