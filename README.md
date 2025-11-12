@@ -195,4 +195,4 @@ If you encounter any issues or have questions, please [open an issue](https://gi
 
 ---
 
-Made with ❤️ by [Encine Carlos](https://github.com/encinecarlos)
+Made with ❤️ by [Carlos Encine](https://github.com/encinecarlos)
