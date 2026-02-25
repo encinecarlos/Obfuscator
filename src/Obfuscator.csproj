@@ -11,7 +11,7 @@
         
         <!-- Package Information -->
         <PackageId>EncineCarlos.Obfuscator</PackageId>
-        <Version>1.0.0</Version>
+        <Version>1.0.1</Version>
         <PackageVersion>$(Version)</PackageVersion>
         
         <!-- Package Metadata -->
@@ -34,6 +34,13 @@
         
         <!-- Release Notes -->
         <PackageReleaseNotes>
+v1.0.1:
+- Upgraded to .NET 10.0 (Long Term Support)
+- Updated dependencies to latest compatible versions
+- All tests pass with no regressions
+- Performance improvements from .NET 10 runtime
+- Enhanced C# 12 language features support
+
 v1.0.0:
 - Initial release with full obfuscation functionality
 - Support for JsonPropertyName attribute in property serialization
@@ -55,8 +62,8 @@ v1.0.0:
         <AssemblyDescription>$(Description)</AssemblyDescription>
         <AssemblyCompany>$(Company)</AssemblyCompany>
         <AssemblyCopyright>$(Copyright)</AssemblyCopyright>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-        <FileVersion>1.0.0.0</FileVersion>
+        <AssemblyVersion>1.0.1.0</AssemblyVersion>
+        <FileVersion>1.0.1.0</FileVersion>
         <InformationalVersion>$(Version)</InformationalVersion>
     </PropertyGroup>
 
