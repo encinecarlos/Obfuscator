@@ -1,0 +1,60 @@
+name: Generate version tag
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-version-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Tag
+        id: generate_tag
+        run: |
+          # Get the latest tag
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.2")
+          echo "Latest tag: $latest_tag"
+          
+          # Remove o prefixo 'v' para manipular a versão
+          version=${latest_tag#v}
+
+          # Extract the version number
+          IFS='.' read -r -a version_parts <<< "$version"
+          major=${version_parts[0]}
+          minor=${version_parts[1]}
+          patch=${version_parts[2]}
+
+          # Verifica o tipo de incremento pelo commit message
+          commit_message=$(git log -1 --pretty=%B)
+
+          if echo "$commit_message" | grep -iq "BREAKING CHANGE"; then
+            major=$((major + 1))
+            minor=0
+            patch=0
+          elif echo "$commit_message" | grep -iq "^feat"; then
+            minor=$((minor + 1))
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+          
+          # Create the new tag com prefixo 'v'
+          new_tag="v$major.$minor.$patch"
+          echo "New tag: $new_tag"
+          
+          echo "new_tag=$new_tag" >> $GITHUB_ENV
+
+      - name: Push Tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ env.new_tag }}
+          git push origin ${{ env.new_tag }}
