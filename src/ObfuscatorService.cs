@@ -20,9 +20,14 @@ namespace Obfuscator
 
         public string ObfuscateSensitiveData<T>(T input)
         {
+            if (input is null)
+            {
+                return JsonSerializer.Serialize(new Dictionary<string, object>());
+            }
+
             var readctor = _redactorProvider.GetRedactor(new DataClassificationSet());
 
-            var type = typeof(T);
+            var type = input.GetType();
 
             var valueObjects = new Dictionary<string, object>();
 
