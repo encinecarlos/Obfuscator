@@ -20,9 +20,14 @@ namespace Obfuscator
 
         public string ObfuscateSensitiveData<T>(T input)
         {
-            var readctor = _redactorProvider.GetRedactor(new DataClassificationSet());
+            if (input is null)
+            {
+                return JsonSerializer.Serialize(new Dictionary<string, object>());
+            }
 
-            var type = typeof(T);
+            var redactor = _redactorProvider.GetRedactor(new DataClassificationSet());
+
+            var type = input.GetType();
 
             var valueObjects = new Dictionary<string, object>();
 
@@ -42,12 +47,12 @@ namespace Obfuscator
                 if (prop.PropertyType == typeof(string))
                 {
                     var strValue = propValue as string ?? String.Empty;
-                    valueObjects[propertyName] = attr != null ? readctor.Redact(strValue) : strValue;
+                    valueObjects[propertyName] = attr != null ? redactor.Redact(strValue) : strValue;
                 }
                 else if (prop.PropertyType.IsValueType)
                 {
                     if (attr != null && propValue != null)
-                        valueObjects[propertyName] = readctor.Redact(propValue.ToString());
+                        valueObjects[propertyName] = redactor.Redact(propValue.ToString());
                     else
                         valueObjects[propertyName] = propValue ?? string.Empty;
 

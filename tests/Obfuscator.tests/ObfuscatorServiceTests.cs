@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Text.Json;
 using Microsoft.Extensions.Compliance.Classification;
 using Microsoft.Extensions.Compliance.Redaction;
 using Moq;
@@ -287,6 +288,131 @@ namespace Obfuscator.tests
             var exception = Record.Exception(() =>
                 System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(result));
             Assert.Null(exception);
+        }
+
+        [Fact]
+        public void ObfuscateSensitiveData_ShouldPreserveJsonContractForStringFields()
+        {
+            var input = new TestDataWithSensitiveString
+            {
+                Username = "john_doe",
+                NonSensitiveData = "public_data"
+            };
+
+            var result = _obfuscatorService.ObfuscateSensitiveData(input);
+
+            using var document = JsonDocument.Parse(result);
+            var root = document.RootElement;
+
+            Assert.Equal("[REDACTED]", root.GetProperty("Username").GetString());
+            Assert.Equal("public_data", root.GetProperty("NonSensitiveData").GetString());
+        }
+
+        [Fact]
+        public void ObfuscateSensitiveData_WithSensitiveValueType_ShouldSerializeAsRedactedString()
+        {
+            var input = new TestDataWithSensitiveInt
+            {
+                SensitiveNumber = 12345,
+                PublicNumber = 999
+            };
+
+            var result = _obfuscatorService.ObfuscateSensitiveData(input);
+
+            using var document = JsonDocument.Parse(result);
+            var root = document.RootElement;
+
+            Assert.Equal(JsonValueKind.String, root.GetProperty("SensitiveNumber").ValueKind);
+            Assert.Equal("[REDACTED]", root.GetProperty("SensitiveNumber").GetString());
+            Assert.Equal(JsonValueKind.Number, root.GetProperty("PublicNumber").ValueKind);
+            Assert.Equal(999, root.GetProperty("PublicNumber").GetInt32());
+        }
+
+        [Fact]
+        public void ObfuscateSensitiveData_WithNullSensitiveNullableValueType_ShouldSerializeEmptyString()
+        {
+            var input = new TestDataWithNullableInt
+            {
+                OptionalNumber = null,
+                PublicNumber = 42
+            };
+
+            var result = _obfuscatorService.ObfuscateSensitiveData(input);
+
+            using var document = JsonDocument.Parse(result);
+            var root = document.RootElement;
+
+            Assert.Equal(JsonValueKind.String, root.GetProperty("OptionalNumber").ValueKind);
+            Assert.Equal(string.Empty, root.GetProperty("OptionalNumber").GetString());
+            Assert.Equal(42, root.GetProperty("PublicNumber").GetInt32());
+        }
+
+        [Fact]
+        public void ObfuscateSensitiveData_WithNestedObject_ShouldSerializeNestedPayloadAsJsonString()
+        {
+            var input = new TestDataWithNestedObject
+            {
+                PublicInfo = "public",
+                NestedSensitiveData = new TestDataWithSensitiveString
+                {
+                    Username = "nested_user",
+                    NonSensitiveData = "nested_public"
+                }
+            };
+
+            var result = _obfuscatorService.ObfuscateSensitiveData(input);
+
+            using var document = JsonDocument.Parse(result);
+            var root = document.RootElement;
+            var nestedJson = root.GetProperty("NestedSensitiveData").GetString();
+
+            Assert.False(string.IsNullOrWhiteSpace(nestedJson));
+
+            using var nestedDocument = JsonDocument.Parse(nestedJson!);
+            var nestedRoot = nestedDocument.RootElement;
+
+            Assert.Equal("[REDACTED]", nestedRoot.GetProperty("Username").GetString());
+            Assert.Equal("nested_public", nestedRoot.GetProperty("NonSensitiveData").GetString());
+        }
+
+        [Fact]
+        public void ObfuscateSensitiveData_WithJsonPropertyName_ShouldUseOnlyMappedNames()
+        {
+            var input = new TestDataWithJsonPropertyName
+            {
+                ApiKey = "secret123",
+                UserName = "john"
+            };
+
+            var result = _obfuscatorService.ObfuscateSensitiveData(input);
+
+            using var document = JsonDocument.Parse(result);
+            var root = document.RootElement;
+
+            Assert.True(root.TryGetProperty("api_key", out var apiKey));
+            Assert.True(root.TryGetProperty("user_name", out var userName));
+            Assert.False(root.TryGetProperty("ApiKey", out _));
+            Assert.False(root.TryGetProperty("UserName", out _));
+            Assert.Equal("[REDACTED]", apiKey.GetString());
+            Assert.Equal("john", userName.GetString());
+        }
+
+        [Fact]
+        public void ObfuscateSensitiveData_WithNestedObject_ShouldRequestRedactorPerObjectLevel()
+        {
+            var input = new TestDataWithNestedObject
+            {
+                PublicInfo = "public",
+                NestedSensitiveData = new TestDataWithSensitiveString
+                {
+                    Username = "nested_user",
+                    NonSensitiveData = "nested_public"
+                }
+            };
+
+            _obfuscatorService.ObfuscateSensitiveData(input);
+
+            _mockRedactorProvider.Verify(p => p.GetRedactor(It.IsAny<DataClassificationSet>()), Times.Exactly(2));
         }
 
         #endregion
