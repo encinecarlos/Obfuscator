@@ -25,7 +25,7 @@ namespace Obfuscator
                 return JsonSerializer.Serialize(new Dictionary<string, object>());
             }
 
-            var readctor = _redactorProvider.GetRedactor(new DataClassificationSet());
+            var redactor = _redactorProvider.GetRedactor(new DataClassificationSet());
 
             var type = input.GetType();
 
@@ -47,12 +47,12 @@ namespace Obfuscator
                 if (prop.PropertyType == typeof(string))
                 {
                     var strValue = propValue as string ?? String.Empty;
-                    valueObjects[propertyName] = attr != null ? readctor.Redact(strValue) : strValue;
+                    valueObjects[propertyName] = attr != null ? redactor.Redact(strValue) : strValue;
                 }
                 else if (prop.PropertyType.IsValueType)
                 {
                     if (attr != null && propValue != null)
-                        valueObjects[propertyName] = readctor.Redact(propValue.ToString());
+                        valueObjects[propertyName] = redactor.Redact(propValue.ToString());
                     else
                         valueObjects[propertyName] = propValue ?? string.Empty;
 
