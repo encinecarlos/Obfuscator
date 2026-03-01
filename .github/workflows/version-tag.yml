@@ -1,0 +1,62 @@
+name: Generate version tag
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-version-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Tag
+        run: |
+          # Get the latest semantic version tag (vX.Y.Z), fallback to v1.0.2 if none exist
+          latest_tag=$(git tag --list "v*.*.*" --sort=-v:refname | head -n 1)
+          if [ -z "$latest_tag" ]; then
+            latest_tag="v1.0.2"
+          fi
+          echo "Latest tag: $latest_tag"
+          
+          # Parse semantic version from latest_tag, defaulting missing parts
+          if [[ "$latest_tag" =~ ^v([0-9]+)(?:\.([0-9]+))?(?:\.([0-9]+))? ]]; then
+            major=${BASH_REMATCH[1]}
+            minor=${BASH_REMATCH[2]:-0}
+            patch=${BASH_REMATCH[3]:-0}
+          else
+            # Fallback to default version if tag doesn't match expected pattern
+            major=1
+            minor=0
+            patch=2
+          fi
+          # Verifica o tipo de incremento pelo commit message
+          commit_message=$(git log -1 --pretty=%B)
+
+          if echo "$commit_message" | grep -iq "BREAKING CHANGE"; then
+            major=$((major + 1))
+            minor=0
+            patch=0
+          elif echo "$commit_message" | grep -iq "^feat"; then
+            minor=$((minor + 1))
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+          
+          # Create the new tag com prefixo 'v'
+          new_tag="v$major.$minor.$patch"
+          echo "New tag: $new_tag"
+          
+          echo "new_tag=$new_tag" >> $GITHUB_ENV
+
+      - name: Push Tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ env.new_tag }}
+          git push origin ${{ env.new_tag }}
