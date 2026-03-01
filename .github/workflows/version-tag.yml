@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:      
 
+concurrency:
+  group: version-tag
+  cancel-in-progress: false
+
 jobs:
   generate-version-tag:
     runs-on: ubuntu-latest
@@ -60,7 +64,13 @@ jobs:
 
       - name: Push Tag
         run: |
+          set -euo pipefail
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag ${{ env.new_tag }}
-          git push origin ${{ env.new_tag }}
+          remote_tags=$(git ls-remote --tags origin)
+          if echo "$remote_tags" | grep -q "refs/tags/${{ env.new_tag }}$"; then
+            echo "::notice::Tag ${{ env.new_tag }} already exists on remote, skipping."
+          else
+            git tag ${{ env.new_tag }}
+            git push origin ${{ env.new_tag }}
+          fi
