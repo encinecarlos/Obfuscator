@@ -1,10 +1,7 @@
 name: Generate version tag
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:      
+  workflow_dispatch:
 
 jobs:
   generate-version-tag:
