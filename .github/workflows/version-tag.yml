@@ -27,15 +27,17 @@ jobs:
           fi
           echo "Latest tag: $latest_tag"
           
-          # Remove o prefixo 'v' para manipular a versão
-          version=${latest_tag#v}
-
-          # Extract the version number
-          IFS='.' read -r -a version_parts <<< "$version"
-          major=${version_parts[0]}
-          minor=${version_parts[1]}
-          patch=${version_parts[2]}
-
+          # Parse semantic version from latest_tag, defaulting missing parts
+          if [[ "$latest_tag" =~ ^v([0-9]+)(?:\.([0-9]+))?(?:\.([0-9]+))? ]]; then
+            major=${BASH_REMATCH[1]}
+            minor=${BASH_REMATCH[2]:-0}
+            patch=${BASH_REMATCH[3]:-0}
+          else
+            # Fallback to default version if tag doesn't match expected pattern
+            major=1
+            minor=0
+            patch=2
+          fi
           # Verifica o tipo de incremento pelo commit message
           commit_message=$(git log -1 --pretty=%B)
 
