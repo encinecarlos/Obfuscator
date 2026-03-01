@@ -20,8 +20,11 @@ jobs:
       - name: Generate Tag
         id: generate_tag
         run: |
-          # Get the latest tag
-          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.2")
+          # Get the latest semantic version tag (vX.Y.Z), fallback to v1.0.2 if none exist
+          latest_tag=$(git tag --list "v*.*.*" --sort=-v:refname | head -n 1)
+          if [ -z "$latest_tag" ]; then
+            latest_tag="v1.0.2"
+          fi
           echo "Latest tag: $latest_tag"
           
           # Remove o prefixo 'v' para manipular a versão
