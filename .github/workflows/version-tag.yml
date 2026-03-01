@@ -34,14 +34,18 @@ jobs:
             minor=0
             patch=2
           fi
-          # Verifica o tipo de incremento pelo commit message
-          commit_message=$(git log -1 --pretty=%B)
+          # Determine bump type from all commits since the previous tag (handles merge commits)
+          if git rev-parse "$latest_tag" >/dev/null 2>&1; then
+            commit_messages=$(git log "${latest_tag}..HEAD" --pretty=%B)
+          else
+            commit_messages=$(git log --pretty=%B)
+          fi
 
-          if echo "$commit_message" | grep -iq "BREAKING CHANGE"; then
+          if echo "$commit_messages" | grep -iq "BREAKING CHANGE"; then
             major=$((major + 1))
             minor=0
             patch=0
-          elif echo "$commit_message" | grep -iq "^feat"; then
+          elif echo "$commit_messages" | grep -iq "^feat"; then
             minor=$((minor + 1))
             patch=0
           else
