@@ -15,7 +15,6 @@ jobs:
           fetch-depth: 0
 
       - name: Generate Tag
-        id: generate_tag
         run: |
           # Get the latest semantic version tag (vX.Y.Z), fallback to v1.0.2 if none exist
           latest_tag=$(git tag --list "v*.*.*" --sort=-v:refname | head -n 1)
